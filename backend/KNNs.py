@@ -2,9 +2,10 @@ import time
 import os
 import numpy
 import face_recognition
-from queue import PriorityQueue 
+from queue import PriorityQueue
 import pandas as pd
 from sklearn.neighbors import KDTree
+from scipy.spatial import KDTree
 from rtree import index
 import linecache as lc
 import json
@@ -40,12 +41,11 @@ class knn_rtree:
         counter = 1
         for item in items:
             val = tuple(numpy.array(list(map(float, item[1].strip("()").split(', ')))))
-            # print("Inserting point " + str(counter))
             self.idx128d.insert(counter, val)
             self.indexed_dictionary[counter] = (str(item[0]), val)
             counter += 1
 
-    def knn_search_rtree(self, file_name, K, cwd, indexed_dictionary,idx):
+    def knn_search_rtree(self, file_name, K, cwd, indexed_dictionary, idx):
         image_path = os.path.join(cwd, file_name)
         if not os.path.exists(image_path):
             print("No path")
@@ -152,31 +152,30 @@ class knn_kdtree:
                         second = pd.DataFrame(numpy.array([path]), columns=["img"])
                         img = pd.concat([img,second])
                     temp1["img"] = img
-                    time1 = time.time()
                     temp1.to_csv(cwd+'/KD-TREE.csv',index=False, encoding='utf-8')    
                     temp1.reset_index(drop=True, inplace=True)
                     tree = KDTree(temp1.iloc[:, 0:-1])
+                    time1 = time.time()
                     dist, ind = tree.query(face_encoding,k)
+                    time2 = time.time()
                     result = []
                     for i in range(len(dist[0])):
                         result.append((temp1.iloc[ind[0][i]].values.tolist()[-1], round(dist[0][i],3)))
-                    time2 = time.time()
-
+                    
                     execution_time = round((time2 - time1) * 1000)
                     print("kdtree took " + str(execution_time) + " ms.")
                     return [result, execution_time]
                 else:
                     print("searching...")
-                    time1 = time.time()
-                    #temp1.to_csv('KD-TREE.csv',index=False, encoding='utf-8')    
                     temp1 = pd.read_csv(cwd+'/KD-TREE.csv')
                     temp1.reset_index(drop=True, inplace=True)
                     tree = KDTree(temp1.iloc[:, 0:-1])
+                    time1 = time.time()
                     dist, ind = tree.query(face_encoding,k)
+                    time2 = time.time()
                     result = []
                     for i in range(len(dist[0])):
                         result.append((temp1.iloc[ind[0][i]].values.tolist()[-1], round(dist[0][i],3)))
-                    time2 = time.time()
 
                     execution_time = round((time2 - time1) * 1000)
                     print("kdtree took " + str(execution_time) + " ms.")
@@ -254,9 +253,7 @@ class knn_seq:
                 info = []
                 print("searching...")
                 time1 = time.time()
-                # for i in range(total):
                 for path in block_dictionary:
-
                     first = numpy.array(list(map(float, block_dictionary[path].strip("()").split(', '))))
                     second = numpy.array(list(map(float, new_face_encoding[0])))
                     distance = numpy.linalg.norm(first - second)
@@ -271,6 +268,14 @@ class knn_seq:
                 return [info, execution_time]
 
     def knn_search(file_name, k, cwd, block_dictionary):
+
+        class CustomItem:
+            def __init__(self, item):
+                self.item = item
+
+            def __lt__(self, other):
+                return self.item[1] < other.item[1]
+
         pq = PriorityQueue(False)
         image_path = os.path.join(cwd, file_name)
         if not os.path.exists(image_path):
@@ -285,8 +290,6 @@ class knn_seq:
             else:
                 new_face_encoding = tuple(face_encoding)
                 result = []
-                #gather info
-                # info = []
                 print("searching...")
                 time1 = time.time()
                 for path in block_dictionary:
@@ -294,10 +297,11 @@ class knn_seq:
                     second = numpy.array(list(map(float, new_face_encoding[0])))
                     distance = numpy.linalg.norm(first - second)
                     person = path
-                    pq.put((person, round(distance,3)))
+                    item = (person, round(distance,3))
+                    pq.put(CustomItem(item))
                     # info.append((person, round(distance,3)))
                 for i in range(k):
-                    result.append(pq.get())
+                    result.append(pq.get().item)
                 time2 = time.time()
 
                 execution_time = round((time2 - time1) * 1000)

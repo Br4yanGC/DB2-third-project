@@ -31,19 +31,6 @@ class Indexacion_Busqueda:
         self.KNN_sequencial  = knn_seq
         self.KNN_RTree       = knn_rtree(self.idx128d, self.block_dictionary, self.indexed_dictionary)
         self.KNN_KDTree      = knn_kdtree
-    
-    def delete_files(self):
-        file_path = os.path.join(cwd, "128d_index.data")
-        file_path2 = os.path.join(cwd, "128d_index.index")
-        try:
-            self.block_dictionary = {}
-            self.indexed_dictionary = {}
-            os.remove(file_path)
-            os.remove(file_path2)
-            print(f"The file '{file_path}' has been deleted successfully.")
-            print(f"The file '{file_path2}' has been deleted successfully.")
-        except OSError as e:
-            print(f"Error occurred while deleting the file: {e}")
 
     def RANGE_SEARCH(self, file_name, radius):
         info = self.KNN_sequencial.range_search(file_name, radius, cwd, self.block_dictionary)
@@ -67,41 +54,32 @@ class Indexacion_Busqueda:
 
 def knn_seq_range_search_exec(query_image, radius):
     smt = Indexacion_Busqueda()
-    result = smt.RANGE_SEARCH(query_image, radius)
-    smt.delete_files()
-    return result 
+    return smt.RANGE_SEARCH(query_image, radius)
 
 def knn_seq_knn_search_exec(query_image, knn):
     smt = Indexacion_Busqueda()
-    result = smt.KNN_SEARCH(query_image, knn)
-    smt.delete_files()
-    return result
+    return smt.KNN_SEARCH(query_image, knn)
 
 def knn_rtree_range_search_exec(query_image, radius):
     smt = Indexacion_Busqueda()
-    result = smt.RANGE_SEARCH_RTREE(query_image, radius)
-    smt.delete_files()
-    return result
+    return smt.RANGE_SEARCH_RTREE(query_image, radius)
 
 def knn_rtree_knn_search_exec(query_image, knn):
     smt = Indexacion_Busqueda()
-    result = smt.KNN_SEARCH_RTREE(query_image, knn)
-    smt.delete_files()
-    return result
+    return smt.KNN_SEARCH_RTREE(query_image, knn)
 
 def knn_kdtree_knn_search_exec(query_image, knn):
     smt = Indexacion_Busqueda()
-    result = smt.KDTREE(query_image, knn)
-    smt.delete_files()
-    return result
-
-def knn_kdtree_knn_search_live_exec():
-        kdtree = knn_kdtree
-        kdtree.live_kdtree(8, cwd)
+    return smt.KDTREE(query_image, knn)
 
 def live_test():
         kdtree = knn_kdtree
         kdtree.live_kdtree(8, cwd)
 
+#live_test()
 
-#knn_kdtree_knn_search_live_exec()
+#printing(knn_seq_range_search_exec())
+#printing(knn_seq_knn_search_exec())
+#printing(knn_rtree_range_search_exec())
+#printing(knn_rtree_knn_search_exec())
+#printing(knn_kdtree_knn_search_exec())

@@ -49,6 +49,10 @@ def knn_kdtree_knn_search():
     formatted_pictures = [{"filename": filename, "score": score} for filename, score in picture_list]
     return {"pictures": formatted_pictures, "execution_time": execution_time}
 
+@app.route("/knn-kdtree-knn-search-live")
+def knn_kdtree_knn_search_live():
+    knn_kdtree_knn_search_live_exec()
+
 @app.route('/send-input', methods=['POST'])
 def send_input():
     global query_image, radius, knn

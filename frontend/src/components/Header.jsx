@@ -36,8 +36,14 @@ const Header = () => {
               </ul>
             </li>
 
-            <li className="nav-item">
-              <a className="nav-link" aria-current="page" href="/knn-kdtree-knn-search">Knn-KdTree</a>
+            <li className="nav-item dropdown">
+              <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Knn-KDTree
+              </a>
+              <ul className="dropdown-menu">
+                <li><a className="dropdown-item" href="/knn-kdtree-knn-search">Knn search</a></li>
+                <li><a className="dropdown-item" href="/knn-kdtree-knn-search-live">Knn search live</a></li>
+              </ul>
             </li>
           </ul>
         </div>

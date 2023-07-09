@@ -11,3 +11,7 @@
   - cd Br4yanGC/DB2-third-project/backend
   - npm install
   - npm run dev
+
+
+## Note
+- Don't click the button on the http://localhost:5173/knn-kdtree-knn-search-live route. We will run the knn-search-live by console due to some difficulties

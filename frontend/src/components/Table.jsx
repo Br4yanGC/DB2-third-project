@@ -18,7 +18,11 @@ const Table = ({ data }) => {
           {data.pictures.map((picture, index) => (
             <tr key={index}>
               <th scope="row">{index + 1}</th>
-              <td>{picture.filename}</td>
+              <td>
+                <a href={`src/assets/lfw/${picture.filename}`} target="_blank" rel="noopener noreferrer">
+                  {picture.filename}
+                </a>
+              </td>
               <td>{picture.score}</td>
             </tr>
           ))}

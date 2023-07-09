@@ -3,3 +3,6 @@ backend/128d_index.index
 backend/feature_vectors.json
 backend/KD-TREE.csv
 backend/venv
+
+node_modules/
+lfw/

@@ -4,10 +4,10 @@
 - Clone the repo
   - gh repo clone Br4yanGC/DB2-third-project
 - Move into the backend folder
-  - cd Br4yanGC/DB2-third-project/frontend   
+  - cd Br4yanGC/DB2-third-project/backend   
   - pip install -r requirements.txt
 - Move into the frontend folder
-  - cd Br4yanGC/DB2-third-project/backend
+  - cd Br4yanGC/DB2-third-project/fronted
   - npm install
 
 Also, you will need to add some files
@@ -57,7 +57,7 @@ Un KD-Tree, o árbol k-dimensional, es una estructura de datos particionada por 
 ## Procesamiento de los datos
 Al correr el programa por primera vez es necesario procesar todas las imágenes del dataset para extraer sus vectores característicos y almacenarlos en memoria secundaria, para ello, se llaman a las funciones `process_dataset` y `load_to_memory`:
 
-La función `process_dataset` opera en un conjunto de imágenes organizadas en subcarpetas por persona dentro de la carpeta dataset. Para cada imagen, la función utiliza la biblioteca `face_recognition` para generar el vector característico del primer rostro detectado. Este vector se guarda en un diccionario (**image_dict**) donde la clave es el nombre de la subcarpeta e imagen, y el valor es el vector característico del rostro. Cada 1000 imágenes procesadas, la función `load_to_memory` es invocada para guardar los vectores característicos en el archivo **feature_vectors.json** y liberar **image_dict**.
+La función `process_dataset` opera en un conjunto de imágenes organizadas en subcarpetas por persona dentro de la carpeta dataset. Para cada imagen, la función utiliza la librería `face_recognition` para generar el vector característico del primer rostro detectado. Este vector se guarda en un diccionario (**image_dict**) donde el _key_ es el nombre de la subcarpeta e imagen, y el valor es el vector característico del rostro. Cada 1000 imágenes procesadas, se llama a la función `load_to_memory` para guardar los vectores característicos en el archivo **feature_vectors.json** y liberar **image_dict**.
 
 ```py
 def process_dataset():
@@ -109,7 +109,7 @@ La función `range_search` en primer lugar, calcula el encoding de la imagen de 
 face = face_recognition.load_image_file(image_path)
 face_encoding = face_recognition.face_encodings(face)
 ```
-Posteriormente, calcula la distancia euclediana con **numpy.linalg.norm** entre el vector característico del primer rostro identificado de la imagen y cada codificación de rostros almacenada en **block_dictionary**. 
+Posteriormente, calcula la distancia euclediana con `numpy.linalg.norm` entre el vector característico del primer rostro identificado de la imagen y cada codificación de rostros almacenada en **block_dictionary**. 
 ```py
 for path in block_dictionary:
     first = numpy.array(list(map(float, block_dictionary[path].strip("()").split(', '))))
@@ -140,7 +140,7 @@ for i in range(k):
 ```
 
 ### RTree
-En la clase `Indexacion_Busqueda` ubicada en el archivo `main.py` se definen las propiedades del R-tree a implementarse, así como los elementos con los que será llenado, que en este caso son todos los vectores característicos de los rostros almacenados en el archivo **feature_vectors.json**. Para cargar estos vectores a la memoria RAM, se utiliza la función `load_block_dictionary`.
+En la clase `Indexacion_Busqueda` ubicada en el archivo `main.py` se definen las propiedades del R-tree a implementarse, así como los elementos con los que será llenado, que en este caso son todos los vectores característicos derivados de la base de datos de rostros almacenados en el archivo **feature_vectors.json**. Para cargar estos vectores a la memoria RAM, se utiliza la función `load_block_dictionary`.
 
 ```py
 def __init__(self):
@@ -154,7 +154,7 @@ def __init__(self):
         self.idx128d = index.Index('128d_index', properties=p)
         self.KNN_RTree = knn_rtree(self.idx128d, self.block_dictionary, self.indexed_dictionary)
 ```
-Luego, en la clase `knn_rtree`, se insertan los vectores característicos en el RTree **idx128d** llamando a `self.idx128d.insert(counter, val)`. La variable **counter** de la forma: 1,2,3,..., actúa como un identificador (key) para cada vector en el R-tree. Esta variable también es utilizada para mapear el key inicial de cada vector, que es el path de cada imagen procesada (**item[0]**) junto a su vector, en el diccionario **indexed_dictionary**, ello con el objetivo de facilitar las operaciones posteriores de búsqueda.
+Luego, la clase `knn_rtree`, se inicializa insertando los vectores característicos en el RTree **idx128d** llamando a `self.idx128d.insert(counter, val)`. La variable **counter** de la forma: 1,2,3,..., actúa como un identificador (_key_) para cada vector en el R-tree. Esta variable también es utilizada para mapear el key inicial de cada vector, que es el _path_ de cada imagen procesada (**item[0]**) junto a su vector, en el diccionario **indexed_dictionary**, ello con el objetivo de facilitar las operaciones posteriores de búsqueda.
 
 ```py
 def __init__(self, p, BD, ID):
@@ -176,12 +176,12 @@ La función `knn_search_rtree` en primer lugar, calcula el encoding de la imagen
 face = face_recognition.load_image_file(image_path)
 face_encoding = face_recognition.face_encodings(face)
 ```
-Luego, llama a la función `nearest` para obtener las key de los K vectores más cercanos en el R-tree.
+Luego, llama a la función `nearest` para obtener las _key_ de los K vectores más cercanos en el R-tree.
 ```py
 new_face_encoding = tuple(face_encoding[0])
 KNNvalue = list(idx.nearest(coordinates=new_face_encoding, num_results=K))
 ```
-Después de obtener los índices, se calcula la distancia euclidiana con **numpy.linalg.norm** entre el vector característico del rostro de la imagen de consulta y cada una de los K vectores de los rostros más cercanos encontrados. Finalmente, se almacenan estas distancias junto con la ruta de la imagen correspondiente en la lista **result**.
+Después de obtener los índices, se calcula la distancia euclidiana con `numpy.linalg.norm` entre el vector característico del rostro de la imagen de consulta y cada uno de los K vectores de los rostros más cercanos encontrados. Finalmente, se almacenan estas distancias junto con el _path_ de la imagen correspondiente en la lista **result**.
 ```py
 for idx in KNNvalue:
     item = indexed_dictionary[idx]
@@ -193,7 +193,7 @@ for idx in KNNvalue:
 ```
 
 * **Búsqueda por rango.**
-Al igual que la función, `knn_search_rtree`, la función `range_search_rtree` primero calcula el encoding (vector característico) del rostro identificado en la imagen de consulta. Posteriormente, para cada punto en esta codificación, se definen los límites inferior y superior a partir del radio de consulta. La variable **bound** se crea al concatenar los `limite_inferior` y `limite_superior` de cada punto, y define la región del espacio de búsqueda (MBR).
+Al igual que la función `knn_search_rtree`, la función `range_search_rtree` primero calcula el encoding (vector característico) del rostro identificado en la imagen de consulta. Posteriormente, para cada punto en esta codificación, se definen los límites inferior y superior a partir del radio de consulta. La variable **bound** se crea al concatenar los `limite_inferior` y `limite_superior` de cada punto, y define la región del espacio de búsqueda (MBR).
 ```py
 for point in new_face_encoding:
     limite_inferior.append(point - radius)
@@ -204,7 +204,7 @@ Posteriormente, se utiliza la función `intersection` para obtener todos los ín
 ```py
 range_values = [n for n in idx.intersection(bound)]
 ```
-Luego, para cada índice en **range_values**, primero se obtiene su encoding correspondiente en **indexed_dictionary**. Después de ello, se calcula la distancia entre este encoding y el de la imagen de consulta. Si esta distancia es menor que el **radius** y el path de esta imagen no es el mismo que el de la imagen anterior, la imagen se agrega a la lista de resultados.
+Luego, para cada índice en **range_values**, primero se obtiene su encoding correspondiente en **indexed_dictionary**. Después de ello, se calcula la distancia entre este encoding y el de la imagen de consulta. Si esta distancia es menor que el **radius** y el _path_ de esta imagen no es el mismo que el de la imagen anterior, la imagen se agrega a la lista de resultados.
 ```py
 second = numpy.array(new_face_encoding[0])
 for idx in range_values:
@@ -218,7 +218,7 @@ for idx in range_values:
 ```
 ### KD-Tree
 * **Búsqueda KNN.**
-Al llamar a la función `kdtree` por primera vez, se crea el archivo **KD-TREE.csv** con el objetivo de optimizar la carga de los datos en la estructura KDTree. Para este proceso, en primer lugar, se convierte en un dataframe a las representaciones vectoriales de las imágenes almacenadas en **block_dictionary** junto al path de cada una (última columna).
+Al llamar a la función `kdtree` por primera vez, se crea el archivo **KD-TREE.csv** con el objetivo de optimizar la carga de los datos en la estructura KDTree. Para este proceso, en primer lugar, se convierte en un dataframe a las representaciones vectoriales de las imágenes almacenadas en **block_dictionary** junto al _path_ de cada una (última columna).
 ```py
 col = [str(i) for i in range(128)]
 temp1 = pd.DataFrame(columns=col)
@@ -232,7 +232,7 @@ for path in block_dictionary:
 temp1["img"] = img
 temp1.to_csv(cwd+'/KD-TREE.csv',index=False, encoding='utf-8')    
 ```
-Una vez creado el archivo **KD-TREE.csv** se llama a la función `KDTree` para construir la estructura de datos multidimensional a partir del dataframe. Posteriormente, se utiliza la función `query` que devuelve dos valores: las distancias a los `k` vecinos más cercanos al encoding del rostro identificado en la imagen de consulta (previamente calculado con la librería `face_recognition`) y los índices de estos vecinos. Finalmente, el programa devuelve este resultado en forma de tupla. 
+Una vez creado el archivo **KD-TREE.csv** se llama a la función `KDTree` para construir la estructura de datos multidimensional a partir del dataframe. Posteriormente, se utiliza la función `query` que devuelve dos valores: las distancias a los `k` vecinos más cercanos al encoding del rostro identificado en la imagen de consulta (previamente calculado con la librería `face_recognition`) y los índices de estos vecinos. Finalmente, el programa devuelve este resultado en una lista de tuplas. 
 ```py
 tree = KDTree(temp1.iloc[:, 0:-1])
 time1 = time.time()

@@ -243,6 +243,12 @@ for i in range(len(dist[0])):
     result.append((temp1.iloc[ind[0][i]].values.tolist()[-1], round(dist[0][i],3)))
 ```
 # Fronted
+**Vista de la plataforma web para búsqueda KNN**
+<img src="./busquedaKNN.png"  width="65%">
+
+**Vista de la plataforma web para búsqueda por rango**
+<img src="./busquedarango.png"  width="65%">
+
 # Experimentación y análisis de los resultados
 Se ejecutó el KNN-secuencial, KNN-RTree y el KNN-KD-Tree sobre una colección de objetos de tamaño N con el objetivo de compararar la eficiencia en función del tiempo de ejecución. Para todos los casos se mantuvo el valor de k=8.
 Los resultados fueron los siguientes:

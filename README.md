@@ -244,4 +244,16 @@ for i in range(len(dist[0])):
 ```
 # Fronted
 # Experimentación
+Se ejecutó el KNN-secuencial, KNN-RTree y el KNN-KD-Tree sobre una colección de objetos de tamaño N con el objetivo de compararar la eficiencia en función del tiempo de ejecución. Para todos los casos se mantuvo el valor de k=8.
+Los resultados fueron los siguientes:
 
+|   N    | Secuencial | R-Tree | KD-Tree |
+|--------|------------|--------|---------|
+|  100   |    240     | 2.857  |   11    |
+|  200   |     16     | 2.736  |   7     |
+|  400   |     18     | 0.658  |   9     |
+|  800   |     61     | 0.556  |   7     |
+| 1600   |     11     | 0.817  |   6     |
+| 3200   |     11     | 0.662  |   6     |
+| 6400   |     10     | 1.351  |   7     |
+| 12800  |     10     | 5.603  |   9     |

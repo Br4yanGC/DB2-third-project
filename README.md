@@ -257,3 +257,5 @@ Los resultados fueron los siguientes:
 | 3200   |     11     | 0.662  |   6     |
 | 6400   |     10     | 1.351  |   7     |
 | 12800  |     10     | 5.603  |   9     |
+
+<img src="./grafico.png"  width="65%">

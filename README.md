@@ -243,7 +243,7 @@ for i in range(len(dist[0])):
     result.append((temp1.iloc[ind[0][i]].values.tolist()[-1], round(dist[0][i],3)))
 ```
 # Fronted
-# Experimentación
+# Experimentación y análisis de los resultados
 Se ejecutó el KNN-secuencial, KNN-RTree y el KNN-KD-Tree sobre una colección de objetos de tamaño N con el objetivo de compararar la eficiencia en función del tiempo de ejecución. Para todos los casos se mantuvo el valor de k=8.
 Los resultados fueron los siguientes:
 
@@ -259,3 +259,7 @@ Los resultados fueron los siguientes:
 | 12800  |     10     | 5.603  |   9     |
 
 <img src="./grafico.png"  width="65%">
+
+Al analizar la gráfica, podemos observar que la búsqueda secuencial tiene un tiempo de búsqueda relativamente constante a medida que el tamaño de los datos (N) aumenta. Algunos de los picos inesperados en el rendimiento de la búsqueda secuencial como para N=100 y N=800 puede deberse a la inestabilidad de la máquina o la carga de trabajo del sistema al momento de ejecutar el algoritmo, por lo que el problema se podría mitigar al repetir el experimento más veces y tomar un promedio de las pruebas.
+
+Por otro lado, se puede observar una ligera mejora en los tiempos de búsqueda para el KD-Tree y una mejora aún mayor para el R-Tree, sin embargo, en ambos casos, se observa una tendencia creciente a medida que el tamaño de los datos (N) aumenta, efecto que puede explicarse bajo el concepto de **"la maldición de la dimensionalidad"** que refiere a los problemas que surgen cuando se trabaja con datos de alta dimensión en espacios multidimensionales. Es decir, los algoritmos de búsqueda como el R-Tree o KD-Tree pueden volverse ineficientes ya que el número de combinaciones posibles de datos aumenta exponencialmente con cada dimensión adicional, de manera que por ejemplo, si los datos tienen muchas características, entonces la eficiencia de estas estructuras puede disminuir, ya que, la distancia entre los puntos se vuelve menos significativa.
